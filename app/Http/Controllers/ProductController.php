@@ -2,25 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Http\Request;
+use App\Contracts\ProductSearchInterface;
 
 class ProductController extends Controller
 {
-   public function index(Request $request) {      
-   
-    if ($request->filled('search')) {
-        $searchQuery = $request->search;
-        $products = Product::search($searchQuery)->paginate(10);
-     
-    } else {
-         $searchQuery = '';
-        $products = Product::paginate(10);
-        
+    protected $productSearch;
+
+    public function __construct(ProductSearchInterface $productSearch)
+    {
+        $this->productSearch = $productSearch;
     }
-    return view('product.search', [
-        'products' => $products,
-        'searchQuery' => $searchQuery,
-    ]);
-  }
+   public function index(Request $request) 
+    {      
+       $searchQuery = $request->filled('search') ? $request->search : '';
+        if ($searchQuery) {
+            $products = $this->productSearch->search($searchQuery);
+        } else {
+            $products = $this->productSearch->search('');
+        }
+        return view('product.search', [
+            'products' => $products,
+            'searchQuery' => $searchQuery,
+        ]);    
+    }
 }

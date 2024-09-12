@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Pagination\Paginator;
+use App\Services\EloquentProductSearch;
 use Illuminate\Support\ServiceProvider;
+use App\Contracts\ProductSearchInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,7 +14,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(ProductSearchInterface::class, EloquentProductSearch::class);
+
     }
 
     /**
